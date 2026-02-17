@@ -284,35 +284,41 @@ export default function Home() {
                   <Menu className="h-4 w-4" />
                 </button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full sm:w-[400px] bg-[#0a0f0a]/95 backdrop-blur-xl border-[#4FAF3B]/10">
-                <SheetHeader>
-                  <SheetTitle className="text-2xl font-extralight text-[#e8efe8] tracking-tight">
-                    {locale === 'ar' ? 'القائمة' : 'Menu'}
-                  </SheetTitle>
-                </SheetHeader>
-                <div className="mt-12 flex flex-col gap-2">
-                  {navItems.map((item) => (
+              <SheetContent side="right" className="w-[85vw] max-w-[400px] sm:max-w-[400px] bg-[#0a0f0a]/98 backdrop-blur-2xl border-l border-[#4FAF3B]/10 p-0">
+                <div className="flex flex-col h-full pt-[env(safe-area-inset-top,0px)]">
+                  <SheetHeader className="px-6 pt-6 pb-2">
+                    <SheetTitle className="text-xl font-light text-[#e8efe8] tracking-tight">
+                      {locale === 'ar' ? 'القائمة' : 'Menu'}
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="flex-1 px-4 pt-4 pb-6 flex flex-col gap-1 overflow-y-auto">
+                    {navItems.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => { scrollToSection(item.id); setIsMenuOpen(false); }}
+                        className={`flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-300 text-left group focus:outline-none ${
+                          activeSection === item.id
+                            ? 'bg-[#4FAF3B]/15 text-[#78C850]'
+                            : 'text-[#e8efe8]/70 hover:bg-white/5 hover:text-[#e8efe8] active:bg-white/10'
+                        }`}
+                      >
+                        <span className="text-base font-light">{item.label}</span>
+                        <ArrowRight className={`h-4 w-4 transition-all duration-300 ${
+                          activeSection === item.id
+                            ? 'opacity-70 translate-x-0'
+                            : 'opacity-0 -translate-x-2 group-hover:opacity-50 group-hover:translate-x-0'
+                        }`} />
+                      </button>
+                    ))}
+                    <Separator className="my-3 bg-[#4FAF3B]/10" />
                     <button
-                      key={item.id}
-                      onClick={() => { scrollToSection(item.id); setIsMenuOpen(false); }}
-                      className={`flex items-center justify-between px-5 py-4 rounded-2xl transition-all duration-300 text-left group ${
-                        activeSection === item.id
-                          ? 'bg-[#4FAF3B]/10 text-[#78C850]'
-                          : 'text-[#e8efe8]/70 hover:bg-white/5 hover:text-[#e8efe8]'
-                      }`}
+                      onClick={() => { toggleLanguage(); setIsMenuOpen(false); }}
+                      className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-[#e8efe8]/70 hover:bg-white/5 hover:text-[#e8efe8] active:bg-white/10 transition-all text-left focus:outline-none"
                     >
-                      <span className="text-lg font-light">{item.label}</span>
-                      <ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                      <Globe className="h-4.5 w-4.5" />
+                      <span className="text-base font-light">{t.nav.language}</span>
                     </button>
-                  ))}
-                  <Separator className="my-4 bg-[#4FAF3B]/10" />
-                  <button
-                    onClick={() => { toggleLanguage(); setIsMenuOpen(false); }}
-                    className="flex items-center gap-3 px-5 py-4 rounded-2xl text-[#e8efe8]/70 hover:bg-white/5 hover:text-[#e8efe8] transition-all text-left"
-                  >
-                    <Globe className="h-5 w-5" />
-                    <span className="text-lg font-light">{t.nav.language}</span>
-                  </button>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
