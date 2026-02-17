@@ -1071,21 +1071,30 @@ export default function Home() {
             {/* Info Cards Stack */}
             <div className="lg:col-span-2 flex flex-col gap-4">
               {/* Address */}
-              <div className="glass-card-enhanced rounded-2xl p-6 group transition-all duration-500 hover:border-[#4FAF3B]/30 hover-lift-subtle">
+              <a
+                href="https://maps.app.goo.gl/cMzkSyvQvcAZvYTS6"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="glass-card-enhanced rounded-2xl p-6 group transition-all duration-500 hover:border-[#4FAF3B]/30 hover-lift-subtle block"
+              >
                 <div className="flex items-start gap-4">
                   <div className="icon-container flex-shrink-0">
                     <MapPin className="h-5 w-5 text-[#78C850]" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-[#e8efe8] mb-1">
+                    <h4 className="text-sm font-medium text-[#e8efe8] mb-1 flex items-center gap-2">
                       {locale === 'ar' ? 'العنوان' : 'Address'}
+                      <ArrowUpRight className="h-3 w-3 text-[#78C850] opacity-0 group-hover:opacity-100 transition-opacity" />
                     </h4>
                     <p className="text-xs text-[#e8efe8]/40 leading-relaxed font-light">
                       {t.contact.address}
                     </p>
+                    <p className="text-[10px] text-[#78C850]/60 mt-1.5 font-light group-hover:text-[#78C850] transition-colors">
+                      {locale === 'ar' ? 'افتح في خرائط جوجل' : 'Open in Google Maps'}
+                    </p>
                   </div>
                 </div>
-              </div>
+              </a>
 
               {/* Email */}
               <div className="glass-card-enhanced rounded-2xl p-6 group transition-all duration-500 hover:border-[#4FAF3B]/30 hover-lift-subtle">
@@ -1130,6 +1139,31 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Embedded Map */}
+          <div className="mt-8 relative rounded-[2rem] overflow-hidden border border-[#4FAF3B]/15 animate-fadeInUp">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1663.5!2d36.3153722!3d33.5261308!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1518e6e601cb0863%3A0x1b7964bc36d4eeeb!2sNouneh%20Pharmacy!5e0!3m2!1sen!2s!4v1708000000000"
+              width="100%"
+              height="350"
+              style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) brightness(0.95) contrast(1.1)' }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Barjouk Pharma Location"
+              className="w-full"
+            />
+            <a
+              href="https://maps.app.goo.gl/cMzkSyvQvcAZvYTS6"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute bottom-4 right-4 z-10 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#4FAF3B] hover:bg-[#2E7D32] text-white text-xs font-medium transition-all duration-300 shadow-lg"
+            >
+              <MapPin className="h-3.5 w-3.5" />
+              {locale === 'ar' ? 'الاتجاهات' : 'Get Directions'}
+              <ArrowUpRight className="h-3 w-3" />
+            </a>
           </div>
         </div>
       </section>

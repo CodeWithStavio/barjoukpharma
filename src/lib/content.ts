@@ -144,9 +144,9 @@ export const content = {
     contact: {
       title: 'Contact Us',
       description: 'We\'re here to serve you. Reach out to us through any of the following channels',
-      address: 'Damascus - Abbaseen Square - Korniche Al-Tijara Street, next to Duck Park',
-      whatsapp: '+963000000000',
-      email: 'info@barjoukpharma.com',
+      address: 'Damascus - Abbaseen Square - East of Trade - Next to Nouna Pharmacy - Aqsab Mosque Real Estate 19',
+      whatsapp: '+963998723973',
+      email: 'partnerofchoice@barjoukpharma.com',
       distributor: 'info@barjoukpharma.com',
       b2b: 'partners@barjoukpharma.com'
     },
@@ -313,9 +313,9 @@ export const content = {
     contact: {
       title: 'تواصل معنا',
       description: 'نحن هنا لخدمتكم. تواصلوا معنا عبر أي من القنوات التالية',
-      address: 'دمشق - ساحة العباسيين - شارع كورنيش التجارة - بجانب حديقة البط',
-      whatsapp: '+963000000000',
-      email: 'info@barjoukpharma.com',
+      address: 'دمشق - ساحة عباسين - شرقي التجارة - جانب صيدلية نونة - عقارية مسجد أقصاب 19',
+      whatsapp: '+963998723973',
+      email: 'partnerofchoice@barjoukpharma.com',
       distributor: 'info@barjoukpharma.com',
       b2b: 'partners@barjoukpharma.com'
     },
