@@ -233,13 +233,13 @@ export default function Home() {
 
       {/* ─────────────── FLOATING PILL NAVIGATION ─────────────── */}
       <nav
-        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-500"
+        className="fixed top-4 sm:top-6 left-0 right-0 z-50 transition-all duration-500 px-3 sm:px-4 flex justify-center"
         style={{ opacity: scrollY > 50 ? 1 : 0.95 }}
       >
-        <div className="glass-strong rounded-full px-2 py-2 flex items-center gap-1 shadow-lg shadow-black/20">
+        <div className="glass-strong rounded-full px-2 py-2 flex items-center gap-1 shadow-lg shadow-black/20 max-w-full">
           <button
             onClick={() => scrollToSection('home')}
-            className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-[#4FAF3B]/10 transition-all duration-300"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full hover:bg-[#4FAF3B]/10 transition-all duration-300 flex-shrink-0"
           >
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#4FAF3B] to-[#2E7D32] flex items-center justify-center">
               <span className="text-white text-xs font-bold">B</span>
@@ -271,7 +271,7 @@ export default function Home() {
 
           <button
             onClick={toggleLanguage}
-            className="px-3 py-2 rounded-full text-xs text-[#e8efe8]/60 hover:text-[#e8efe8] hover:bg-white/5 transition-all duration-300 flex items-center gap-1.5"
+            className="px-2.5 sm:px-3 py-2 rounded-full text-xs text-[#e8efe8]/60 hover:text-[#e8efe8] hover:bg-white/5 transition-all duration-300 flex items-center gap-1.5 flex-shrink-0"
           >
             <Globe className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">{t.nav.language}</span>
