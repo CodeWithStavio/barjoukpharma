@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -37,9 +38,32 @@ export default function Home() {
   const [currentProductIndex, setCurrentProductIndex] = useState(0);
   const [activeSection, setActiveSection] = useState('home');
   const [scrollY, setScrollY] = useState(0);
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+  const navContainerRef = useRef<HTMLDivElement>(null);
+  const navButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const isNavigatingRef = useRef(false);
+  const navTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const t = content[locale];
   const direction = getDirection(locale);
+
+  // Measure the active nav button position for the sliding indicator
+  const updateIndicator = useCallback(() => {
+    const activeBtn = navButtonRefs.current.get(activeSection);
+    const container = navContainerRef.current;
+    if (activeBtn && container) {
+      const containerRect = container.getBoundingClientRect();
+      const btnRect = activeBtn.getBoundingClientRect();
+      setIndicatorStyle({
+        left: btnRect.left - containerRect.left,
+        width: btnRect.width,
+      });
+    }
+  }, [activeSection]);
+
+  useEffect(() => {
+    updateIndicator();
+  }, [activeSection, locale, updateIndicator]);
 
   useScrollAnimation();
 
@@ -111,12 +135,14 @@ export default function Home() {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           setScrollY(window.scrollY);
-          const sections = ['home', 'about', 'products', 'services', 'advantages', 'contact'];
-          for (const section of [...sections].reverse()) {
-            const el = document.getElementById(section);
-            if (el && window.scrollY >= el.offsetTop - 200) {
-              setActiveSection(section);
-              break;
+          if (!isNavigatingRef.current) {
+            const sections = ['home', 'about', 'products', 'services', 'advantages', 'contact'];
+            for (const section of [...sections].reverse()) {
+              const el = document.getElementById(section);
+              if (el && window.scrollY >= el.offsetTop - 200) {
+                setActiveSection(section);
+                break;
+              }
             }
           }
           ticking = false;
@@ -140,6 +166,10 @@ export default function Home() {
   const toggleLanguage = () => setLocale(locale === 'en' ? 'ar' : 'en');
 
   const scrollToSection = (sectionId: string) => {
+    setActiveSection(sectionId);
+    isNavigatingRef.current = true;
+    if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
+    navTimeoutRef.current = setTimeout(() => { isNavigatingRef.current = false; }, 1000);
     const element = document.getElementById(sectionId);
     element?.scrollIntoView({ behavior: 'smooth' });
     setIsMenuOpen(false);
@@ -251,14 +281,21 @@ export default function Home() {
 
           <div className="w-px h-5 bg-[#4FAF3B]/20 hidden md:block" />
 
-          <div className="hidden md:flex items-center gap-0.5">
+          <div ref={navContainerRef} className="hidden md:flex items-center gap-0.5 relative">
+            <motion.div
+              className="absolute top-0 bottom-0 rounded-full bg-[#4FAF3B]/15"
+              animate={{ left: indicatorStyle.left, width: indicatorStyle.width }}
+              transition={{ type: 'spring', stiffness: 350, damping: 30, mass: 0.8 }}
+              style={{ pointerEvents: 'none' }}
+            />
             {navItems.map((item) => (
               <button
                 key={item.id}
+                ref={(el) => { if (el) navButtonRefs.current.set(item.id, el); }}
                 onClick={() => scrollToSection(item.id)}
-                className={`px-4 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-300 ${
+                className={`px-4 py-2 rounded-full text-xs font-medium tracking-wide transition-colors duration-300 relative z-10 ${
                   activeSection === item.id
-                    ? 'bg-[#4FAF3B]/15 text-[#78C850]'
+                    ? 'text-[#78C850]'
                     : 'text-[#e8efe8]/60 hover:text-[#e8efe8] hover:bg-white/5'
                 }`}
               >
