@@ -21,6 +21,10 @@ const notoSansArabic = Noto_Sans_Arabic({
 export const metadata: Metadata = {
   title: "Barjouk Pharma - برجوك فارما",
   description: "Leading Syrian pharmaceutical company specialized in registration, medical marketing, and distribution - شركة دوائية سورية رائدة متخصصة في التسجيل والتسويق الطبي والتوزيع",
+  icons: {
+    icon: "/images/barjouk-logo.png",
+    apple: "/images/barjouk-logo.png",
+  },
 };
 
 export default function RootLayout({

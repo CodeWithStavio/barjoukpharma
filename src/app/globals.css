@@ -517,37 +517,39 @@
   overflow: hidden;
   pointer-events: none;
   z-index: 1;
+  perspective-origin: 50% 50%;
 }
 
 .px-shape {
   position: absolute;
-  will-change: transform;
+  will-change: transform, translate;
+  transition: transform 0.25s ease-out;
 }
 
 /* ── PILLS / CAPSULES ── */
 .px-capsule {
   border-radius: 100px;
   background: linear-gradient(90deg,
-    rgba(79,175,59,0.3) 0%, rgba(79,175,59,0.3) 46%,
-    rgba(255,255,255,0.12) 46%, rgba(255,255,255,0.12) 54%,
-    rgba(46,125,50,0.22) 54%, rgba(46,125,50,0.22) 100%);
-  box-shadow: 0 2px 15px rgba(79,175,59,0.18), inset 0 1px 0 rgba(255,255,255,0.12);
+    rgba(79,175,59,0.55) 0%, rgba(79,175,59,0.55) 46%,
+    rgba(255,255,255,0.25) 46%, rgba(255,255,255,0.25) 54%,
+    rgba(46,125,50,0.4) 54%, rgba(46,125,50,0.4) 100%);
+  box-shadow: 0 4px 25px rgba(79,175,59,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
 }
 
 .px-capsule-blue {
   border-radius: 100px;
   background: linear-gradient(90deg,
-    rgba(47,74,109,0.32) 0%, rgba(47,74,109,0.32) 46%,
-    rgba(255,255,255,0.1) 46%, rgba(255,255,255,0.1) 54%,
-    rgba(79,175,59,0.22) 54%, rgba(79,175,59,0.22) 100%);
-  box-shadow: 0 2px 12px rgba(47,74,109,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
+    rgba(47,74,109,0.55) 0%, rgba(47,74,109,0.55) 46%,
+    rgba(255,255,255,0.22) 46%, rgba(255,255,255,0.22) 54%,
+    rgba(79,175,59,0.4) 54%, rgba(79,175,59,0.4) 100%);
+  box-shadow: 0 4px 22px rgba(47,74,109,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
 }
 
 /* ── ROUND TABLET with score line ── */
 .px-tablet {
   border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, rgba(79,175,59,0.32), rgba(79,175,59,0.12) 70%);
-  box-shadow: 0 2px 12px rgba(79,175,59,0.18), inset 0 1px 0 rgba(255,255,255,0.12);
+  background: radial-gradient(circle at 40% 35%, rgba(79,175,59,0.55), rgba(79,175,59,0.2) 70%);
+  box-shadow: 0 4px 22px rgba(79,175,59,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
   position: relative;
 }
 .px-tablet::after {
@@ -561,7 +563,8 @@
 
 /* ── HEXAGONAL MOLECULE (benzene ring) ── */
 .px-hex {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 116%27%3E%3Cpolygon points=%2750,3 97,28 97,88 50,113 3,88 3,28%27 fill=%27none%27 stroke=%27rgba(79,175,59,0.22)%27 stroke-width=%272%27/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 116%27%3E%3Cpolygon points=%2750,3 97,28 97,88 50,113 3,88 3,28%27 fill=%27rgba(79,175,59,0.04)%27 stroke=%27rgba(79,175,59,0.45)%27 stroke-width=%272.5%27/%3E%3C/svg%3E");
+  filter: drop-shadow(0 0 8px rgba(79,175,59,0.15));
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -607,7 +610,7 @@
 .px-med-cross::after {
   content: '';
   position: absolute;
-  background: rgba(79,175,59,0.25);
+  background: rgba(79,175,59,0.5);
   border-radius: 3px;
 }
 .px-med-cross::before {
@@ -622,8 +625,8 @@
 /* ── ATOM with orbital rings ── */
 .px-atom {
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, rgba(79,175,59,0.38), rgba(79,175,59,0.1) 70%);
-  box-shadow: 0 0 18px rgba(79,175,59,0.22);
+  background: radial-gradient(circle at 35% 35%, rgba(79,175,59,0.65), rgba(79,175,59,0.2) 70%);
+  box-shadow: 0 0 30px rgba(79,175,59,0.45), 0 0 60px rgba(79,175,59,0.15);
   position: relative;
 }
 .px-atom::before {
@@ -644,6 +647,35 @@
   border-radius: 50%;
   transform: rotate(-30deg) scaleY(0.35);
 }
+
+/* ── Ambient floating — smooth graceful arcs using CSS `translate` (GPU, no JS) ── */
+@keyframes px-drift-bg {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 10px -15px; }
+}
+@keyframes px-drift-mid {
+  0%, 100% { translate: 0 0; }
+  50% { translate: -8px 12px; }
+}
+@keyframes px-drift-fg {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 6px -10px; }
+}
+
+/* Slow layer — large shapes, slow graceful drift */
+.px-hex, .px-hex-double, .px-heartbeat { animation: px-drift-bg 20s ease-in-out infinite; }
+/* Mid layer — medium shapes */
+.px-capsule, .px-capsule-blue, .px-molecule, .px-tablet { animation: px-drift-mid 16s ease-in-out infinite; }
+/* Fast layer — small glowing shapes */
+.px-med-cross, .px-atom { animation: px-drift-fg 12s ease-in-out infinite; }
+
+/* ── Pulsing glow ── */
+@keyframes px-pulse-glow {
+  0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 8px rgba(79,175,59,0.2)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 20px rgba(79,175,59,0.55)) drop-shadow(0 0 45px rgba(120,200,80,0.15)); }
+}
+.px-glow.px-med-cross { animation: px-drift-fg 12s ease-in-out infinite, px-pulse-glow 4s ease-in-out infinite; }
+.px-glow.px-atom { animation: px-drift-fg 12s ease-in-out infinite, px-pulse-glow 4s ease-in-out infinite; }
 
 /* Hide on mobile for performance */
 @media (max-width: 767px) {

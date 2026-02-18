@@ -11,10 +11,24 @@ export const content = {
       language: 'العربية'
     },
     hero: {
-      title: 'Barjouk Pharma',
-      subtitle: 'Elevating Healthcare... Building Trust',
-      description: 'A leading Syrian pharmaceutical company specialized in registration, medical marketing, and distribution of pharmaceutical products. From Damascus to all Syrian governorates, we deliver safe, high-quality health solutions through advanced distribution and a specialized team.',
-      cta: 'Contact Us Today'
+      cta: 'Contact Us Today',
+      slides: [
+        {
+          title: 'Barjouk Pharma',
+          subtitle: 'Elevating Healthcare... Building Trust',
+          description: 'A leading Syrian pharmaceutical company specialized in registration, medical marketing, and distribution of pharmaceutical products.'
+        },
+        {
+          title: 'Quality Healthcare',
+          subtitle: 'Safe & Certified Products',
+          description: 'From Damascus to all Syrian governorates, we deliver safe, high-quality health solutions through advanced distribution and a specialized team.'
+        },
+        {
+          title: 'Trusted in Syria',
+          subtitle: 'From Damascus to Every Governorate',
+          description: 'We serve as a trusted bridge between international pharmaceutical manufacturers and the Syrian healthcare market.'
+        }
+      ]
     },
     about: {
       title: 'About Us',
@@ -180,10 +194,24 @@ export const content = {
       language: 'English'
     },
     hero: {
-      title: 'برجوك فارما',
-      subtitle: 'نرتقي بالرعاية الصحية .... ونبني الثقة',
-      description: 'شركة سورية رائدة متخصصة في تسجيل وتسويق وتوزيع المنتجات الدوائية. من دمشق إلى جميع المحافظات السورية، نقدم حلولاً صحية آمنة وعالية الجودة من خلال شبكة توزيع متقدمة وفريق متخصص.',
-      cta: 'تواصل معنا اليوم'
+      cta: 'تواصل معنا اليوم',
+      slides: [
+        {
+          title: 'برجوك فارما',
+          subtitle: 'نرتقي بالرعاية الصحية .... ونبني الثقة',
+          description: 'شركة سورية رائدة متخصصة في تسجيل وتسويق وتوزيع المنتجات الدوائية.'
+        },
+        {
+          title: 'رعاية صحية عالية الجودة',
+          subtitle: 'منتجات آمنة ومعتمدة',
+          description: 'من دمشق إلى جميع المحافظات السورية، نقدم حلولاً صحية آمنة وعالية الجودة من خلال شبكة توزيع متقدمة وفريق متخصص.'
+        },
+        {
+          title: 'موثوقون في سوريا',
+          subtitle: 'من دمشق إلى كل محافظة',
+          description: 'نعمل كجسر موثوق بين الشركات الدوائية العالمية والسوق الصحي السوري.'
+        }
+      ]
     },
     about: {
       title: 'من نحن',

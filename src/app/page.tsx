@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -43,6 +44,7 @@ export default function Home() {
   const navButtonRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
   const isNavigatingRef = useRef(false);
   const navTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const parallaxSceneRef = useRef<HTMLDivElement>(null);
 
   const t = content[locale];
   const direction = getDirection(locale);
@@ -71,20 +73,27 @@ export default function Home() {
      PARALLAX ENGINE — Direct scroll-driven, GPU-accelerated
      ═══════════════════════════════════════════════════════════ */
 
-  // Transform helpers — using translate3d triggers GPU compositing
+  // 3D Parallax — each shape gets a Z-depth (perspective handles speed automatically)
+  // + scroll-driven Y offset. Mouse tilt is applied on the parent scene via ref.
+  const cl = (v: number, r: number) => Math.max(-r, Math.min(r, v));
+
+  // z: depth (-400 = far/slow, -150 = mid, +100 = near/fast)
+  const d3 = (z: number, scrollSpeed: number): React.CSSProperties => ({
+    transform: `translateZ(${z}px) translateY(${cl(scrollY * scrollSpeed, 250)}px)`,
+  });
+  const d3r = (z: number, scrollSpeed: number, rotSpeed: number): React.CSSProperties => ({
+    transform: `translateZ(${z}px) translateY(${cl(scrollY * scrollSpeed, 250)}px) rotate(${scrollY * rotSpeed}deg)`,
+  });
+
+  // Per-section depth elements (no 3D scene, just simple scroll offset)
   const pY = (speed: number): React.CSSProperties => ({
-    transform: `translate3d(0, ${scrollY * speed}px, 0)`,
-    willChange: 'transform',
+    transform: `translate3d(0, ${cl(scrollY * speed * 0.15, 200)}px, 0)`,
   });
-
   const pYR = (speed: number, rotSpeed: number): React.CSSProperties => ({
-    transform: `translate3d(0, ${scrollY * speed}px, 0) rotate(${scrollY * rotSpeed}deg)`,
-    willChange: 'transform',
+    transform: `translate3d(0, ${cl(scrollY * speed * 0.15, 200)}px, 0) rotate(${scrollY * rotSpeed * 0.1}deg)`,
   });
-
   const pYS = (speed: number, scaleRate: number): React.CSSProperties => ({
-    transform: `translate3d(0, ${scrollY * speed}px, 0) scale(${1 + scrollY * scaleRate})`,
-    willChange: 'transform',
+    transform: `translate3d(0, ${cl(scrollY * speed * 0.15, 200)}px, 0) scale(${1 + cl(scrollY * scaleRate * 0.0003, 0.3)})`,
   });
 
   // Hero content fade — dramatic separation from background
@@ -155,9 +164,24 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+
+
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
+
+  // Mouse-tracking 3D tilt — updates the parallax scene directly (no re-renders)
+  useEffect(() => {
+    const handle = (e: MouseEvent) => {
+      if (!parallaxSceneRef.current) return;
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;   // -1 to 1
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      parallaxSceneRef.current.style.transform =
+        `rotateY(${x * 4}deg) rotateX(${-y * 3}deg)`;
+    };
+    window.addEventListener('mousemove', handle, { passive: true });
+    return () => window.removeEventListener('mousemove', handle);
+  }, []);
 
   /* ═══════════════════════════════════════════════════════════
      HANDLERS
@@ -202,63 +226,39 @@ export default function Home() {
         <div className="orb orb-accent w-[400px] h-[400px] bottom-[-5%] left-[20%]" />
       </div>
 
-      {/* ─────────────── FIXED PARALLAX LAYER — Pharma-themed shapes ─────────────── */}
-      <div className="parallax-layer">
-        {/* ── CAPSULES / PILLS (background layer — slow) ── */}
-        <div style={pYR(-0.15, 0.02)} className="px-shape px-capsule w-[50px] h-[20px] top-[10%] left-[8%]" />
-        <div style={pYR(-0.12, -0.015)} className="px-shape px-capsule-blue w-[44px] h-[18px] top-[58%] right-[7%]" />
-        <div style={pYR(-0.18, 0.025)} className="px-shape px-capsule w-[38px] h-[16px] top-[35%] left-[82%]" />
-        <div style={pYR(-0.14, -0.02)} className="px-shape px-capsule-blue w-[55px] h-[22px] top-[78%] left-[18%]" />
-        <div style={pYR(-0.16, 0.018)} className="px-shape px-capsule w-[42px] h-[17px] top-[48%] left-[55%]" />
+      {/* ─────────────── 3D PARALLAX SCENE — perspective + mouse tilt ─────────────── */}
+      <div className="parallax-layer" style={{ perspective: '1000px' }}>
+        <div
+          ref={parallaxSceneRef}
+          className="absolute inset-0"
+          style={{ transformStyle: 'preserve-3d', transition: 'transform 0.4s ease-out' }}
+        >
+          {/* ═══ FAR LAYER (z:-400) — large shapes, slow scroll ═══ */}
+          <div style={d3r(-400, -0.02, 0.003)} className="px-shape px-hex w-[140px] h-[150px] top-[18%] left-[3%]" />
+          <div style={d3r(-400, -0.025, -0.002)} className="px-shape px-hex-double w-[170px] h-[95px] top-[55%] right-[2%]" />
+          <div style={d3(-400, -0.018)} className="px-shape px-molecule w-[150px] h-[120px] top-[38%] left-[42%]" />
+          <div style={d3(-400, -0.022)} className="px-shape px-heartbeat w-[300px] h-[58px] top-[75%] left-[4%]" />
+          <div style={d3(-400, -0.015)} className="px-shape px-heartbeat w-[260px] h-[50px] top-[12%] right-[6%]" />
+          <div style={d3r(-400, -0.02, 0.002)} className="px-shape px-hex w-[110px] h-[120px] top-[82%] left-[55%]" />
 
-        {/* ── ROUND TABLETS ── */}
-        <div style={pY(-0.2)} className="px-shape px-tablet w-[28px] h-[28px] top-[22%] right-[18%]" />
-        <div style={pY(-0.17)} className="px-shape px-tablet w-[24px] h-[24px] top-[68%] left-[35%]" />
+          {/* ═══ MID LAYER (z:-150) — medium shapes, moderate scroll ═══ */}
+          <div style={d3r(-150, -0.05, 0.008)} className="px-shape px-capsule w-[70px] h-[27px] top-[10%] left-[8%]" />
+          <div style={d3r(-150, -0.045, -0.006)} className="px-shape px-capsule-blue w-[65px] h-[25px] top-[45%] right-[5%]" />
+          <div style={d3(-150, -0.055)} className="px-shape px-molecule w-[120px] h-[92px] top-[26%] right-[14%]" />
+          <div style={d3(-150, -0.05)} className="px-shape px-tablet w-[36px] h-[36px] top-[62%] left-[24%]" />
+          <div style={d3r(-150, -0.048, 0.005)} className="px-shape px-capsule w-[58px] h-[23px] top-[72%] right-[28%]" />
+          <div style={d3(-150, -0.055)} className="px-shape px-molecule w-[105px] h-[82px] top-[85%] left-[32%]" />
+          <div style={d3(-150, -0.045)} className="px-shape px-tablet w-[32px] h-[32px] top-[33%] left-[52%]" />
+          <div style={d3r(-150, -0.05, -0.005)} className="px-shape px-capsule-blue w-[55px] h-[22px] top-[8%] left-[68%]" />
 
-        {/* ── HEXAGONAL MOLECULES (medium layer — rotate on scroll) ── */}
-        <div style={pYR(-0.2, 0.04)} className="px-shape px-hex w-[80px] h-[90px] top-[15%] right-[5%]" />
-        <div style={pYR(-0.16, -0.03)} className="px-shape px-hex w-[60px] h-[70px] top-[65%] left-[6%]" />
-        <div style={pYR(-0.22, 0.05)} className="px-shape px-hex-double w-[120px] h-[70px] top-[40%] left-[30%]" />
-
-        {/* ── MOLECULE STRUCTURES ── */}
-        <div style={pY(-0.25)} className="px-shape px-molecule w-[100px] h-[80px] top-[28%] left-[65%]" />
-        <div style={pY(-0.22)} className="px-shape px-molecule w-[80px] h-[65px] top-[72%] right-[25%]" />
-
-        {/* ── MORE CAPSULES (varied depths) ── */}
-        <div style={pYR(-0.2, -0.03)} className="px-shape px-capsule w-[46px] h-[19px] top-[88%] right-[15%]" />
-        <div style={pYR(-0.25, 0.02)} className="px-shape px-capsule-blue w-[40px] h-[16px] top-[15%] left-[62%]" />
-        <div style={pYR(-0.17, -0.018)} className="px-shape px-capsule w-[52px] h-[21px] top-[92%] left-[70%]" />
-
-        {/* ── MEDICAL CROSSES (fast layer) ── */}
-        <div style={pY(-0.35)} className="px-shape px-med-cross w-[22px] h-[22px] top-[20%] left-[45%]" />
-        <div style={pY(-0.38)} className="px-shape px-med-cross w-[18px] h-[18px] top-[75%] left-[60%]" />
-        <div style={pY(-0.32)} className="px-shape px-med-cross w-[20px] h-[20px] top-[50%] left-[8%]" />
-        <div style={pY(-0.36)} className="px-shape px-med-cross w-[16px] h-[16px] top-[38%] right-[30%]" />
-
-        {/* ── ATOMS with orbital rings (medium) ── */}
-        <div style={pYR(-0.22, 0.06)} className="px-shape px-atom w-[14px] h-[14px] top-[32%] left-[12%]" />
-        <div style={pYR(-0.26, -0.05)} className="px-shape px-atom w-[12px] h-[12px] top-[55%] right-[20%]" />
-        <div style={pYR(-0.2, 0.04)} className="px-shape px-atom w-[10px] h-[10px] top-[85%] left-[48%]" />
-        <div style={pYR(-0.24, 0.05)} className="px-shape px-atom w-[13px] h-[13px] top-[12%] right-[40%]" />
-        <div style={pYR(-0.28, -0.04)} className="px-shape px-atom w-[11px] h-[11px] top-[70%] left-[75%]" />
-
-        {/* ── HEARTBEAT / EKG LINES ── */}
-        <div style={pY(-0.18)} className="px-shape px-heartbeat w-[200px] h-[40px] top-[42%] left-[3%]" />
-        <div style={pY(-0.22)} className="px-shape px-heartbeat w-[160px] h-[32px] top-[82%] right-[5%]" />
-        <div style={pY(-0.2)} className="px-shape px-heartbeat w-[180px] h-[36px] top-[18%] right-[20%]" />
-
-        {/* ── MORE HEXAGONAL MOLECULES ── */}
-        <div style={pYR(-0.18, 0.035)} className="px-shape px-hex w-[70px] h-[80px] top-[82%] left-[8%]" />
-        <div style={pYR(-0.24, -0.04)} className="px-shape px-hex-double w-[110px] h-[65px] top-[58%] left-[48%]" />
-        <div style={pYR(-0.19, 0.03)} className="px-shape px-hex w-[55px] h-[65px] top-[25%] left-[35%]" />
-
-        {/* ── MORE MOLECULES ── */}
-        <div style={pY(-0.23)} className="px-shape px-molecule w-[90px] h-[72px] top-[45%] left-[15%]" />
-        <div style={pY(-0.27)} className="px-shape px-molecule w-[85px] h-[68px] top-[8%] right-[15%]" />
-
-        {/* ── MORE TABLETS ── */}
-        <div style={pY(-0.22)} className="px-shape px-tablet w-[26px] h-[26px] top-[38%] right-[8%]" />
-        <div style={pY(-0.19)} className="px-shape px-tablet w-[22px] h-[22px] top-[92%] right-[38%]" />
+          {/* ═══ NEAR LAYER (z:+100) — small glowing shapes, fast scroll ═══ */}
+          <div style={d3(100, -0.1)} className="px-shape px-med-cross w-[28px] h-[28px] top-[24%] left-[14%] px-glow" />
+          <div style={d3r(100, -0.09, 0.015)} className="px-shape px-atom w-[20px] h-[20px] top-[50%] right-[10%] px-glow" />
+          <div style={d3(100, -0.11)} className="px-shape px-med-cross w-[24px] h-[24px] top-[65%] left-[44%] px-glow" />
+          <div style={d3r(100, -0.095, -0.012)} className="px-shape px-atom w-[18px] h-[18px] top-[16%] right-[34%] px-glow" />
+          <div style={d3(100, -0.1)} className="px-shape px-atom w-[16px] h-[16px] top-[40%] left-[72%] px-glow" />
+          <div style={d3(100, -0.09)} className="px-shape px-med-cross w-[22px] h-[22px] top-[80%] right-[18%] px-glow" />
+        </div>
       </div>
 
       {/* ─────────────── FLOATING PILL NAVIGATION ─────────────── */}
@@ -271,9 +271,7 @@ export default function Home() {
             onClick={() => scrollToSection('home')}
             className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full hover:bg-[#4FAF3B]/10 transition-all duration-300 flex-shrink-0"
           >
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#4FAF3B] to-[#2E7D32] flex items-center justify-center">
-              <span className="text-white text-xs font-bold">B</span>
-            </div>
+            <Image src="/images/barjouk-logo.png" alt="Barjouk Pharma Logo" width={44} height={44} className="w-11 h-11 object-contain drop-shadow-[0_0_8px_rgba(79,175,59,0.4)]" />
             <span className="text-[#e8efe8] text-sm font-medium tracking-wide hidden lg:block">
               {locale === 'ar' ? 'برجوك' : 'Barjouk'}
             </span>
@@ -324,8 +322,9 @@ export default function Home() {
               <SheetContent side="right" className="w-[85vw] max-w-[400px] sm:max-w-[400px] bg-[#0a0f0a]/98 backdrop-blur-2xl border-l border-[#4FAF3B]/10 p-0">
                 <div className="flex flex-col h-full pt-[env(safe-area-inset-top,0px)]">
                   <SheetHeader className="px-6 pt-6 pb-2">
-                    <SheetTitle className="text-xl font-light text-[#e8efe8] tracking-tight">
-                      {locale === 'ar' ? 'القائمة' : 'Menu'}
+                    <SheetTitle className="flex items-center gap-3 text-xl font-light text-[#e8efe8] tracking-tight">
+                      <Image src="/images/barjouk-logo.png" alt="Barjouk Pharma Logo" width={40} height={40} className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(79,175,59,0.4)]" />
+                      {locale === 'ar' ? 'برجوك فارما' : 'Barjouk Pharma'}
                     </SheetTitle>
                   </SheetHeader>
                   <div className="flex-1 px-4 pt-4 pb-6 flex flex-col gap-1 overflow-y-auto">
@@ -458,20 +457,32 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Title */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-extralight text-[#e8efe8] mb-8 leading-[0.95] tracking-tighter animate-fadeInUp" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
-              {t.hero.title.split(' ').slice(0, 2).join(' ')}
-              <br />
-              <span className="text-gradient">{t.hero.title.split(' ').slice(2).join(' ')}</span>
-            </h1>
+            {/* Slide content — animated per slide */}
+            <div className="relative min-h-[320px] md:min-h-[350px]">
+              {t.hero.slides.map((slide, index) => (
+                <div
+                  key={index}
+                  className={`transition-all duration-700 ease-out ${
+                    index === currentImageIndex
+                      ? 'opacity-100 translate-y-0 relative'
+                      : 'opacity-0 translate-y-4 absolute inset-0 pointer-events-none'
+                  }`}
+                >
+                  {/* Title */}
+                  <h1 className="text-5xl md:text-7xl lg:text-8xl font-extralight text-[#e8efe8] mb-8 leading-[0.95] tracking-tighter">
+                    {slide.title}
+                  </h1>
 
-            {/* Subtitle */}
-            <p className="text-lg md:text-xl text-[#e8efe8]/70 mb-4 font-light leading-relaxed max-w-2xl animate-fadeInUp" style={{ animationDelay: '0.5s', animationFillMode: 'both' }}>
-              {t.hero.subtitle}
-            </p>
-            <p className="text-base text-[#e8efe8]/50 mb-12 max-w-xl font-light leading-relaxed animate-fadeInUp" style={{ animationDelay: '0.6s', animationFillMode: 'both' }}>
-              {t.hero.description}
-            </p>
+                  {/* Subtitle */}
+                  <p className="text-lg md:text-xl text-[#e8efe8]/70 mb-4 font-light leading-relaxed max-w-2xl">
+                    {slide.subtitle}
+                  </p>
+                  <p className="text-base text-[#e8efe8]/50 mb-12 max-w-xl font-light leading-relaxed">
+                    {slide.description}
+                  </p>
+                </div>
+              ))}
+            </div>
 
             {/* CTA Row */}
             <div className="flex flex-wrap items-center gap-4 animate-fadeInUp" style={{ animationDelay: '0.8s', animationFillMode: 'both' }}>
@@ -493,7 +504,7 @@ export default function Home() {
               </Button>
             </div>
 
-            {/* Image indicators */}
+            {/* Slide indicators */}
             <div className="flex items-center gap-2 mt-16 animate-fadeInUp" style={{ animationDelay: '1s', animationFillMode: 'both' }}>
               {heroImages.map((_, index) => (
                 <button
@@ -504,7 +515,7 @@ export default function Home() {
                       ? 'bg-[#4FAF3B] w-10'
                       : 'bg-[#e8efe8]/20 w-6 hover:bg-[#e8efe8]/40'
                   }`}
-                  aria-label={`Go to image ${index + 1}`}
+                  aria-label={`Go to slide ${index + 1}`}
                 />
               ))}
               <span className="ml-3 text-xs text-[#e8efe8]/30 font-mono">
@@ -1115,7 +1126,7 @@ export default function Home() {
             <div className="lg:col-span-2 flex flex-col gap-4">
               {/* Address */}
               <a
-                href="https://maps.app.goo.gl/cMzkSyvQvcAZvYTS6"
+                href="https://www.google.com/maps/dir/?api=1&destination=33.526306,36.317208"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="glass-card-enhanced rounded-2xl p-6 group transition-all duration-500 hover:border-[#4FAF3B]/30 hover-lift-subtle block"
@@ -1185,12 +1196,16 @@ export default function Home() {
           </div>
 
           {/* Embedded Map */}
-          <div className="mt-8 relative rounded-[2rem] overflow-hidden border border-[#4FAF3B]/15 animate-fadeInUp">
+          <div className="mt-8 relative rounded-[2rem] overflow-hidden border border-[#4FAF3B]/15 animate-fadeInUp h-[350px]">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1663.5!2d36.3153722!3d33.5261308!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1518e6e601cb0863%3A0x1b7964bc36d4eeeb!2sNouneh%20Pharmacy!5e0!3m2!1sen!2s!4v1708000000000"
+              src="https://maps.google.com/maps?q=33.526306,36.317208&z=17&output=embed"
               width="100%"
-              height="350"
-              style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) brightness(0.95) contrast(1.1)' }}
+              height="450"
+              style={{
+                border: 0,
+                filter: 'invert(1) hue-rotate(180deg)',
+                marginBottom: '-100px',
+              }}
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -1198,7 +1213,7 @@ export default function Home() {
               className="w-full"
             />
             <a
-              href="https://maps.app.goo.gl/cMzkSyvQvcAZvYTS6"
+              href="https://www.google.com/maps/dir/?api=1&destination=33.526306,36.317208"
               target="_blank"
               rel="noopener noreferrer"
               className="absolute bottom-4 right-4 z-10 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#4FAF3B] hover:bg-[#2E7D32] text-white text-xs font-medium transition-all duration-300 shadow-lg"
@@ -1219,9 +1234,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#4FAF3B] to-[#2E7D32] flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">B</span>
-                </div>
+                <Image src="/images/barjouk-logo.png" alt="Barjouk Pharma Logo" width={48} height={48} className="w-12 h-12 object-contain drop-shadow-[0_0_8px_rgba(79,175,59,0.4)]" />
                 <span className="text-lg font-light text-[#e8efe8] tracking-wide">
                   {locale === 'ar' ? 'برجوك فارما' : 'Barjouk Pharma'}
                 </span>
@@ -1252,7 +1265,7 @@ export default function Home() {
             </div>
 
             <p className="text-xs text-[#e8efe8]/15 font-light">
-              © 2025 Coddra. inc. All rights reserved.
+              © 2026 Coddra. inc. All rights reserved.
             </p>
           </div>
         </div>
