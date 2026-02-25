@@ -1265,7 +1265,7 @@ export default function Home() {
             </div>
 
             <p className="text-xs text-[#e8efe8]/15 font-light">
-              © 2026 Coddra. inc. All rights reserved.
+              © 2026 Barjouk Pharma. All rights reserved. Created by Coddra.
             </p>
           </div>
         </div>

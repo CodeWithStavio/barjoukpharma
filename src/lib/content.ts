@@ -149,10 +149,10 @@ export const content = {
       title: 'By the Numbers',
       items: [
         { number: '14', label: 'Syrian governorates covered' },
-        { number: '150+', label: 'Registered pharmaceutical products' },
+        { number: '8+', label: 'Registered pharmaceutical products' },
         { number: '500+', label: 'Healthcare facilities served' },
-        { number: '50+', label: 'International partner brands' },
-        { number: '98%', label: 'On-time delivery rate' }
+        { number: '3+', label: 'International partner brands' },
+        { number: '95%', label: 'On-time delivery rate' }
       ]
     },
     contact: {
@@ -160,9 +160,9 @@ export const content = {
       description: 'We\'re here to serve you. Reach out to us through any of the following channels',
       address: 'Damascus - Abbaseen Square - East of Trade - Next to Nouna Pharmacy - Aqsab Mosque Real Estate 19',
       whatsapp: '+963998723973',
-      email: 'partnerofchoice@barjoukpharma.com',
+      email: 'info@barjoukpharma.com',
       distributor: 'info@barjoukpharma.com',
-      b2b: 'partners@barjoukpharma.com'
+      b2b: 'partnerofchoice@barjoukpharma.com'
     },
     sectionLabels: {
       aboutKabrita: 'About Barjouk',
@@ -332,10 +332,10 @@ export const content = {
       title: 'بالأرقام',
       items: [
         { number: '14', label: 'محافظة سورية مغطاة' },
-        { number: '+150', label: 'منتج دوائي مسجل' },
+        { number: '+8', label: 'منتج دوائي مسجل' },
         { number: '+500', label: 'منشأة صحية يتم خدمتها' },
-        { number: '+50', label: 'علامة تجارية شريكة دولية' },
-        { number: '%98', label: 'معدل التسليم في الوقت المحدد' }
+        { number: '+3', label: 'علامة تجارية شريكة دولية' },
+        { number: '%95', label: 'معدل التسليم في الوقت المحدد' }
       ]
     },
     contact: {
@@ -343,9 +343,9 @@ export const content = {
       description: 'نحن هنا لخدمتكم. تواصلوا معنا عبر أي من القنوات التالية',
       address: 'دمشق - ساحة عباسين - شرقي التجارة - جانب صيدلية نونة - عقارية مسجد أقصاب 19',
       whatsapp: '+963998723973',
-      email: 'partnerofchoice@barjoukpharma.com',
+      email: 'info@barjoukpharma.com',
       distributor: 'info@barjoukpharma.com',
-      b2b: 'partners@barjoukpharma.com'
+      b2b: 'partnerofchoice@barjoukpharma.com'
     },
     sectionLabels: {
       aboutKabrita: 'عن برجوك',
